@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Task</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="add-page">
+<h2 id="form-title">Add New Task</h2>
+    <textarea id="new-task-text" placeholder="Enter your task here..."></textarea>
+    <button id="add-task-btn">Add Task</button>
+    <a href="index.html" class="back-btn">← Back</a>
+  </div>
+
+  <script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const taskId = urlParams.get("id");
+  const textArea = document.getElementById('new-task-text');
+  const addBtn = document.getElementById('add-task-btn');
+
+  if (taskId) {
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    const taskToEdit = tasks.find(t => t.id == taskId);
+    if (taskToEdit) {
+      textArea.value = taskToEdit.text;
+      textArea.focus();
+
+    }
+
+    addBtn.innerText = "Update Task";
+    document.getElementById("form-title").innerText = "Edit Task"; // ✅ correct
+
+  }
+
+  addBtn.onclick = function () {
+    const taskText = textArea.value.trim();
+    if (!taskText) return;
+
+    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+    if (taskId) {
+      // Edit Mode
+      const taskIndex = tasks.findIndex(t => t.id == taskId);
+      if (taskIndex > -1) {
+        tasks[taskIndex].text = taskText;
+        tasks[taskIndex].timestamp = new Date().toLocaleString();
+      }
+    } else {
+      // New Task
+      tasks.push({
+        id: Date.now(),
+        text: taskText,
+        completed: false,
+        timestamp: new Date().toLocaleString()
+      });
+    }
+
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    window.location.href = "index.html";
+  };
+</script>
+
+</body>
+</html>
